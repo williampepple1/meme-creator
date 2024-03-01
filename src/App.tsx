@@ -2,7 +2,8 @@ import React, { useState, useRef, ChangeEvent } from 'react';
 
 const App: React.FC = () => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [text, setText] = useState<string>('');
+  const [topText, setTopText] = useState<string>('');
+  const [bottomText, setBottomText] = useState<string>('');
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -17,7 +18,7 @@ const App: React.FC = () => {
     }
   };
 
-  const drawImage = () => {
+  const drawImageWithText = () => {
     if (!imageSrc) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -30,7 +31,10 @@ const App: React.FC = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0);
       ctx.font = '30px Arial';
-      ctx.fillText(text, 50, 50); // This can be made dynamic
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'white';
+      ctx.fillText(topText, canvas.width / 2, 40); // Positioning top text
+      ctx.fillText(bottomText, canvas.width / 2, canvas.height - 20); // Positioning bottom text
     };
     img.src = imageSrc;
   };
@@ -48,8 +52,19 @@ const App: React.FC = () => {
   return (
     <div>
       <input type="file" onChange={handleImageChange} />
-      <input type="text" value={text} onChange={(e) => setText(e.target.value)} />
-      <button onClick={drawImage}>Add Text</button>
+      <input
+        type="text"
+        placeholder="Top text"
+        value={topText}
+        onChange={(e) => setTopText(e.target.value)}
+      />
+      <input
+        type="text"
+        placeholder="Bottom text"
+        value={bottomText}
+        onChange={(e) => setBottomText(e.target.value)}
+      />
+      <button onClick={drawImageWithText}>Add Text</button>
       <button onClick={downloadMeme}>Download Meme</button>
       <canvas ref={canvasRef} style={{ display: 'block', margin: '0 auto' }} />
     </div>
