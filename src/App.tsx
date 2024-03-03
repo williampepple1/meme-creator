@@ -23,6 +23,38 @@ const App: React.FC = () => {
     }
   };
 
+
+  const drawTextBackground = (ctx, text, x, y, maxWidth, lineHeight) => {
+    const words = text.split(' ');
+    let line = '';
+    let lines = 0;
+
+    for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = ctx.measureText(testLine);
+        const testWidth = metrics.width;
+        if (testWidth > maxWidth && n > 0) {
+            line = words[n] + ' ';
+            lines++;
+        } else {
+            line = testLine;
+        }
+    }
+    lines++; // Add the last line
+
+    // Assuming a padding of 10px around the text for the background
+    const padding = 10;
+    const backgroundHeight = lines * lineHeight + padding * 2; // Total height of the background
+    const startY = y - lineHeight; // Adjust based on the text alignment
+
+    // Draw the background
+    ctx.fillStyle = 'white';
+    ctx.fillRect(x - maxWidth / 2 - padding, startY, maxWidth + padding * 2, backgroundHeight);
+
+    // Reset fillStyle for text drawing
+    ctx.fillStyle = 'black';
+}
+
   const drawWrappedText = (ctx, text, x, y, maxWidth, lineHeight) => {
     const words = text.split(' ');
     let line = '';
@@ -44,45 +76,43 @@ const App: React.FC = () => {
 }
 
 
-  const drawImageWithText = () => {
-    if (!imageSrc) {
-        toast.error("Please upload an image before adding text.");
-        return;
-    }
-    setTextAdded(true); // Indicate that text has been added
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-    img.onload = () => {
-        canvas.width = img.width;
-        canvas.height = img.height;
-        if (!ctx) return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0);
-        ctx.font = '30px Arial';
-        ctx.fillStyle = 'black';
-        ctx.textAlign = 'center';
+const drawImageWithText = () => {
+  if (!imageSrc) {
+      toast.error("Please upload an image before adding text.");
+      return;
+  }
+  setTextAdded(true); // Indicate that text has been added
+  const canvas = canvasRef.current;
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const img = new Image();
+  img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+      ctx.font = '30px Arial';
+      ctx.textAlign = 'center';
+      const maxWidth = canvas.width - 40; // Adjust based on your canvas size
+      const lineHeight = 35; // Adjust based on your font size
 
-        // Adjust these values as needed
-        const maxWidth = canvas.width - 40; // 20px padding on each side
-        const lineHeight = 35; // Adjust line height as needed
-        const topY = 40; // Starting Y position for top text
-        const bottomY = canvas.height - 20; // Starting Y position for bottom text, adjust as needed
+      // Background and text for top text
+      if (topText) {
+          const topY = 40; // Adjust based on where you want the top text to start
+          drawTextBackground(ctx, topText, canvas.width / 2, topY, maxWidth, lineHeight);
+          drawWrappedText(ctx, topText, canvas.width / 2, topY, maxWidth, lineHeight);
+      }
 
-        // Draw top text
-        if (topText) {
-            drawWrappedText(ctx, topText, canvas.width / 2, topY, maxWidth, lineHeight);
-        }
-
-        // Draw bottom text
-        if (bottomText) {
-            // This simply flips the bottom text upside down; you might want to adjust its calculation
-            drawWrappedText(ctx, bottomText, canvas.width / 2, bottomY, maxWidth, lineHeight);
-        }
-    };
-    img.src = imageSrc;
+      // Background and text for bottom text
+      if (bottomText) {
+          const bottomY = canvas.height - (lineHeight * 2); // Start position for bottom text, adjust as needed
+          drawTextBackground(ctx, bottomText, canvas.width / 2, bottomY, maxWidth, lineHeight);
+          drawWrappedText(ctx, bottomText, canvas.width / 2, bottomY, maxWidth, lineHeight);
+      }
+  };
+  img.src = imageSrc;
 };
+
 
 
   const downloadMeme = () => {
