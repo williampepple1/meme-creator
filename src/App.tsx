@@ -6,6 +6,7 @@ const App: React.FC = () => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [topText, setTopText] = useState<string>('');
   const [bottomText, setBottomText] = useState<string>('');
+  const [textAdded, setTextAdded] = useState<boolean>(false); // Track if text has been added
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -15,12 +16,12 @@ const App: React.FC = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImageSrc(reader.result as string);
+        setTextAdded(false); // Reset text added flag on new image upload
       };
       reader.readAsDataURL(file);
     }
   };
 
-  
   const drawTextBackground = (ctx: CanvasRenderingContext2D, text: string, x: number, y: number) => {
     ctx.font = '30px Arial';
     const metrics = ctx.measureText(text);
@@ -32,12 +33,12 @@ const App: React.FC = () => {
     ctx.fillRect(xPos, yPos, textWidth + padding * 2, 40);
   };
 
- 
   const drawImageWithText = () => {
     if (!imageSrc) {
       toast.error("Please upload an image before adding text.");
       return;
     }
+    setTextAdded(true); // Indicate that text has been added
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -49,11 +50,13 @@ const App: React.FC = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0);
       ctx.textAlign = 'center';
+
       if (topText) {
         drawTextBackground(ctx, topText, canvas.width / 2, 40);
         ctx.fillStyle = 'black';
         ctx.fillText(topText, canvas.width / 2, 40);
       }
+
       if (bottomText) {
         drawTextBackground(ctx, bottomText, canvas.width / 2, canvas.height - 20);
         ctx.fillStyle = 'black';
@@ -63,10 +66,9 @@ const App: React.FC = () => {
     img.src = imageSrc;
   };
 
- 
   const downloadMeme = () => {
-    if (!imageSrc) {
-      toast.error("Please upload an image to download your meme.");
+    if (!imageSrc || !textAdded) {
+      toast.error("Please upload an image and add text to download your meme.");
       return;
     }
     const canvas = canvasRef.current;
@@ -96,8 +98,8 @@ const App: React.FC = () => {
       />
       <button onClick={drawImageWithText}>Add Text</button>
       <button onClick={downloadMeme}>Download Meme</button>
-      {imageSrc && <img src={imageSrc} alt="Uploaded" style={{ display: 'block', maxWidth: '100%', maxHeight: '500px', margin: '10px auto' }} />}
-      <canvas ref={canvasRef} style={{ display: 'none' }} />
+      {imageSrc && !textAdded && <img src={imageSrc} alt="Uploaded" style={{ display: 'block', maxWidth: '100%', maxHeight: '500px', margin: '10px auto' }} />}
+      <canvas ref={canvasRef} style={{ display: textAdded ? 'block' : 'none', margin: '0 auto' }} />
     </div>
   );
 };
