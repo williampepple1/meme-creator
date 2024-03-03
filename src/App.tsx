@@ -82,31 +82,21 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="p-4 max-w-md mx-auto">
-      <ToastContainer />
-      <div className="flex flex-col gap-4">
-        <input type="file" className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100" onChange={handleImageChange} />
-        <input
-          type="text"
-          placeholder="Top text"
-          className="input input-bordered w-full max-w-xs"
-          value={topText}
-          onChange={(e) => setTopText(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Bottom text"
-          className="input input-bordered w-full max-w-xs"
-          value={bottomText}
-          onChange={(e) => setBottomText(e.target.value)}
-        />
-        <div className="flex gap-4">
-          <button className="btn btn-primary" onClick={drawImageWithText}>Add Text</button>
-          <button className="btn btn-secondary" onClick={downloadMeme}>Download Meme</button>
+    <div className="flex justify-center items-center min-h-screen">
+      <div className="p-4 space-y-4 max-w-md mx-auto">
+        <ToastContainer />
+        <input type="file" onChange={handleImageChange} className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100" />
+        <input type="text" placeholder="Top text" value={topText} onChange={(e) => setTopText(e.target.value)} className="input input-bordered w-full max-w-xs" />
+        <input type="text" placeholder="Bottom text" value={bottomText} onChange={(e) => setBottomText(e.target.value)} className="input input-bordered w-full max-w-xs" />
+        <div className="flex gap-4 justify-center">
+          <button onClick={drawImageWithText} className="btn btn-primary">Add Text</button>
+          <button onClick={downloadMeme} className="btn btn-secondary">Download Meme</button>
         </div>
+        {imageSrc && !textAdded && (
+          <img src={imageSrc} alt="Uploaded" className="mt-4 mx-auto max-w-xs rounded-lg shadow-lg" />
+        )}
+        <canvas ref={canvasRef} className={`mt-4 ${textAdded ? 'block' : 'hidden'} mx-auto`} />
       </div>
-      {imageSrc && !textAdded && <img src={imageSrc} alt="Uploaded" className="mt-4 mx-auto max-w-xs rounded-lg shadow-lg" />}
-      <canvas ref={canvasRef} className={`mt-4 ${textAdded ? 'block' : 'hidden'} mx-auto`} />
     </div>
   );
 };
