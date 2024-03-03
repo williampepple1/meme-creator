@@ -20,18 +20,19 @@ const App: React.FC = () => {
     }
   };
 
+  
   const drawTextBackground = (ctx: CanvasRenderingContext2D, text: string, x: number, y: number) => {
     ctx.font = '30px Arial';
     const metrics = ctx.measureText(text);
     const textWidth = metrics.width;
     const padding = 10;
     ctx.fillStyle = 'white';
-    // Adjust the x position based on text alignment
     const xPos = x - textWidth / 2 - padding;
-    const yPos = y - 30; // Roughly adjust based on font size and padding
-    ctx.fillRect(xPos, yPos, textWidth + padding * 2, 40); // Adjust height manually
+    const yPos = y - 30;
+    ctx.fillRect(xPos, yPos, textWidth + padding * 2, 40);
   };
 
+ 
   const drawImageWithText = () => {
     if (!imageSrc) {
       toast.error("Please upload an image before adding text.");
@@ -48,24 +49,21 @@ const App: React.FC = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0);
       ctx.textAlign = 'center';
-
-      // Draw top text background
       if (topText) {
         drawTextBackground(ctx, topText, canvas.width / 2, 40);
-        ctx.fillStyle = 'black'; // Text color
+        ctx.fillStyle = 'black';
         ctx.fillText(topText, canvas.width / 2, 40);
       }
-
-      // Draw bottom text background
       if (bottomText) {
         drawTextBackground(ctx, bottomText, canvas.width / 2, canvas.height - 20);
-        ctx.fillStyle = 'black'; // Text color
+        ctx.fillStyle = 'black';
         ctx.fillText(bottomText, canvas.width / 2, canvas.height - 20);
       }
     };
     img.src = imageSrc;
   };
 
+ 
   const downloadMeme = () => {
     if (!imageSrc) {
       toast.error("Please upload an image to download your meme.");
@@ -98,7 +96,8 @@ const App: React.FC = () => {
       />
       <button onClick={drawImageWithText}>Add Text</button>
       <button onClick={downloadMeme}>Download Meme</button>
-      <canvas ref={canvasRef} style={{ display: 'block', margin: '0 auto' }} />
+      {imageSrc && <img src={imageSrc} alt="Uploaded" style={{ display: 'block', maxWidth: '100%', maxHeight: '500px', margin: '10px auto' }} />}
+      <canvas ref={canvasRef} style={{ display: 'none' }} />
     </div>
   );
 };
