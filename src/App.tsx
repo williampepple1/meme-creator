@@ -1,4 +1,6 @@
 import React, { useState, useRef, ChangeEvent } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const App: React.FC = () => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -31,7 +33,10 @@ const App: React.FC = () => {
   };
 
   const drawImageWithText = () => {
-    if (!imageSrc) return;
+    if (!imageSrc) {
+      toast.error("Please upload an image before adding text.");
+      return;
+    }
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -62,6 +67,10 @@ const App: React.FC = () => {
   };
 
   const downloadMeme = () => {
+    if (!imageSrc) {
+      toast.error("Please upload an image to download your meme.");
+      return;
+    }
     const canvas = canvasRef.current;
     if (!canvas) return;
     const image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
@@ -73,6 +82,7 @@ const App: React.FC = () => {
 
   return (
     <div>
+      <ToastContainer />
       <input type="file" onChange={handleImageChange} />
       <input
         type="text"
