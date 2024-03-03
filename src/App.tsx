@@ -23,21 +23,31 @@ const App: React.FC = () => {
     }
   };
 
-  const drawTextBackground = (ctx: CanvasRenderingContext2D, text: string, x: number, y: number) => {
-    ctx.font = '30px Arial';
-    const metrics = ctx.measureText(text);
-    const textWidth = metrics.width;
-    const padding = 10;
-    ctx.fillStyle = 'white';
-    const xPos = x - textWidth / 2 - padding;
-    const yPos = y - 30;
-    ctx.fillRect(xPos, yPos, textWidth + padding * 2, 40);
-  };
+  const drawWrappedText = (ctx, text, x, y, maxWidth, lineHeight) => {
+    const words = text.split(' ');
+    let line = '';
+    let testLine = '';
+    let testWidth = 0;
+
+    for (let n = 0; n < words.length; n++) {
+        testLine = line + words[n] + ' ';
+        testWidth = ctx.measureText(testLine).width;
+        if (testWidth > maxWidth && n > 0) {
+            ctx.fillText(line, x, y);
+            line = words[n] + ' ';
+            y += lineHeight;
+        } else {
+            line = testLine;
+        }
+    }
+    ctx.fillText(line, x, y);
+}
+
 
   const drawImageWithText = () => {
     if (!imageSrc) {
-      toast.error("Please upload an image before adding text.");
-      return;
+        toast.error("Please upload an image before adding text.");
+        return;
     }
     setTextAdded(true); // Indicate that text has been added
     const canvas = canvasRef.current;
@@ -45,27 +55,35 @@ const App: React.FC = () => {
     const ctx = canvas.getContext('2d');
     const img = new Image();
     img.onload = () => {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      if (!ctx) return;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0);
-      ctx.textAlign = 'center';
-
-      if (topText) {
-        drawTextBackground(ctx, topText, canvas.width / 2, 40);
+        canvas.width = img.width;
+        canvas.height = img.height;
+        if (!ctx) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+        ctx.font = '30px Arial';
         ctx.fillStyle = 'black';
-        ctx.fillText(topText, canvas.width / 2, 40);
-      }
+        ctx.textAlign = 'center';
 
-      if (bottomText) {
-        drawTextBackground(ctx, bottomText, canvas.width / 2, canvas.height - 20);
-        ctx.fillStyle = 'black';
-        ctx.fillText(bottomText, canvas.width / 2, canvas.height - 20);
-      }
+        // Adjust these values as needed
+        const maxWidth = canvas.width - 40; // 20px padding on each side
+        const lineHeight = 35; // Adjust line height as needed
+        const topY = 40; // Starting Y position for top text
+        const bottomY = canvas.height - 20; // Starting Y position for bottom text, adjust as needed
+
+        // Draw top text
+        if (topText) {
+            drawWrappedText(ctx, topText, canvas.width / 2, topY, maxWidth, lineHeight);
+        }
+
+        // Draw bottom text
+        if (bottomText) {
+            // This simply flips the bottom text upside down; you might want to adjust its calculation
+            drawWrappedText(ctx, bottomText, canvas.width / 2, bottomY, maxWidth, lineHeight);
+        }
     };
     img.src = imageSrc;
-  };
+};
+
 
   const downloadMeme = () => {
     if (!imageSrc || !textAdded) {
