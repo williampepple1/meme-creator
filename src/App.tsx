@@ -24,7 +24,15 @@ const App: React.FC = () => {
   };
 
 
-  const drawTextBackground = (ctx, text, x, y, maxWidth, lineHeight) => {
+  const drawTextBackground = (
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    x: number,
+    y: number,
+    maxWidth: number,
+    lineHeight: number
+    
+    ) => {
     const words = text.split(' ');
     let line = '';
     let lines = 0;
@@ -55,7 +63,14 @@ const App: React.FC = () => {
     ctx.fillStyle = 'black';
 }
 
-  const drawWrappedText = (ctx, text, x, y, maxWidth, lineHeight) => {
+  const drawWrappedText = (
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    x: number,
+    y: number,
+    maxWidth: number,
+    lineHeight: number
+    ) => {
     const words = text.split(' ');
     let line = '';
     let testLine = '';
@@ -78,41 +93,42 @@ const App: React.FC = () => {
 
 const drawImageWithText = () => {
   if (!imageSrc) {
-      toast.error("Please upload an image before adding text.");
-      return;
+    toast.error("Please upload an image before adding text.");
+    return;
   }
   setTextAdded(true); // Indicate that text has been added
   const canvas = canvasRef.current;
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas?.getContext('2d');
+  if (!canvas || !ctx) {
+    toast.error("Canvas or context is not available.");
+    return;
+  }
   const img = new Image();
   img.onload = () => {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0);
-      ctx.font = '30px Arial';
-      ctx.textAlign = 'center';
-      const maxWidth = canvas.width - 40; // Adjust based on your canvas size
-      const lineHeight = 35; // Adjust based on your font size
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0);
+    ctx.font = '30px Arial';
+    ctx.fillStyle = 'black';
+    ctx.textAlign = 'center';
+    const maxWidth = canvas.width - 40; // Adjust based on your canvas size
+    const lineHeight = 35; // Adjust based on your font size
 
-      // Background and text for top text
-      if (topText) {
-          const topY = 40; // Adjust based on where you want the top text to start
-          drawTextBackground(ctx, topText, canvas.width / 2, topY, maxWidth, lineHeight);
-          drawWrappedText(ctx, topText, canvas.width / 2, topY, maxWidth, lineHeight);
-      }
+    if (topText) {
+      const topY = 40; // Adjust based on where you want the top text to start
+      drawTextBackground(ctx, topText, canvas.width / 2, topY, maxWidth, lineHeight);
+      drawWrappedText(ctx, topText, canvas.width / 2, topY, maxWidth, lineHeight);
+    }
 
-      // Background and text for bottom text
-      if (bottomText) {
-          const bottomY = canvas.height - (lineHeight * 2); // Start position for bottom text, adjust as needed
-          drawTextBackground(ctx, bottomText, canvas.width / 2, bottomY, maxWidth, lineHeight);
-          drawWrappedText(ctx, bottomText, canvas.width / 2, bottomY, maxWidth, lineHeight);
-      }
+    if (bottomText) {
+      const bottomY = canvas.height - (lineHeight * 2); // Start position for bottom text, adjust as needed
+      drawTextBackground(ctx, bottomText, canvas.width / 2, bottomY, maxWidth, lineHeight);
+      drawWrappedText(ctx, bottomText, canvas.width / 2, bottomY, maxWidth, lineHeight);
+    }
   };
   img.src = imageSrc;
 };
-
 
 
   const downloadMeme = () => {
