@@ -18,6 +18,18 @@ const App: React.FC = () => {
     }
   };
 
+  const drawTextBackground = (ctx: CanvasRenderingContext2D, text: string, x: number, y: number) => {
+    ctx.font = '30px Arial';
+    const metrics = ctx.measureText(text);
+    const textWidth = metrics.width;
+    const padding = 10;
+    ctx.fillStyle = 'white';
+    // Adjust the x position based on text alignment
+    const xPos = x - textWidth / 2 - padding;
+    const yPos = y - 30; // Roughly adjust based on font size and padding
+    ctx.fillRect(xPos, yPos, textWidth + padding * 2, 40); // Adjust height manually
+  };
+
   const drawImageWithText = () => {
     if (!imageSrc) return;
     const canvas = canvasRef.current;
@@ -30,11 +42,21 @@ const App: React.FC = () => {
       if (!ctx) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0);
-      ctx.font = '30px Arial';
       ctx.textAlign = 'center';
-      ctx.fillStyle = 'white';
-      ctx.fillText(topText, canvas.width / 2, 40); // Positioning top text
-      ctx.fillText(bottomText, canvas.width / 2, canvas.height - 20); // Positioning bottom text
+
+      // Draw top text background
+      if (topText) {
+        drawTextBackground(ctx, topText, canvas.width / 2, 40);
+        ctx.fillStyle = 'black'; // Text color
+        ctx.fillText(topText, canvas.width / 2, 40);
+      }
+
+      // Draw bottom text background
+      if (bottomText) {
+        drawTextBackground(ctx, bottomText, canvas.width / 2, canvas.height - 20);
+        ctx.fillStyle = 'black'; // Text color
+        ctx.fillText(bottomText, canvas.width / 2, canvas.height - 20);
+      }
     };
     img.src = imageSrc;
   };
