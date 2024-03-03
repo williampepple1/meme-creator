@@ -1,6 +1,7 @@
 import React, { useState, useRef, ChangeEvent } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import './index.css';
 
 const App: React.FC = () => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -16,7 +17,7 @@ const App: React.FC = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImageSrc(reader.result as string);
-        setTextAdded(false); // Reset text added flag on new image upload
+        setTextAdded(false); // Reset text added flag on new image upload 
       };
       reader.readAsDataURL(file);
     }
@@ -81,25 +82,31 @@ const App: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="p-4 max-w-md mx-auto">
       <ToastContainer />
-      <input type="file" onChange={handleImageChange} />
-      <input
-        type="text"
-        placeholder="Top text"
-        value={topText}
-        onChange={(e) => setTopText(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Bottom text"
-        value={bottomText}
-        onChange={(e) => setBottomText(e.target.value)}
-      />
-      <button onClick={drawImageWithText}>Add Text</button>
-      <button onClick={downloadMeme}>Download Meme</button>
-      {imageSrc && !textAdded && <img src={imageSrc} alt="Uploaded" style={{ display: 'block', maxWidth: '100%', maxHeight: '500px', margin: '10px auto' }} />}
-      <canvas ref={canvasRef} style={{ display: textAdded ? 'block' : 'none', margin: '0 auto' }} />
+      <div className="flex flex-col gap-4">
+        <input type="file" className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100" onChange={handleImageChange} />
+        <input
+          type="text"
+          placeholder="Top text"
+          className="input input-bordered w-full max-w-xs"
+          value={topText}
+          onChange={(e) => setTopText(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Bottom text"
+          className="input input-bordered w-full max-w-xs"
+          value={bottomText}
+          onChange={(e) => setBottomText(e.target.value)}
+        />
+        <div className="flex gap-4">
+          <button className="btn btn-primary" onClick={drawImageWithText}>Add Text</button>
+          <button className="btn btn-secondary" onClick={downloadMeme}>Download Meme</button>
+        </div>
+      </div>
+      {imageSrc && !textAdded && <img src={imageSrc} alt="Uploaded" className="mt-4 mx-auto max-w-xs rounded-lg shadow-lg" />}
+      <canvas ref={canvasRef} className={`mt-4 ${textAdded ? 'block' : 'hidden'} mx-auto`} />
     </div>
   );
 };
