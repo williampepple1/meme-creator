@@ -1,4 +1,4 @@
-import React, { useState, useRef, ChangeEvent } from 'react';
+import React, { useState, useRef, ChangeEvent, useEffect, useCallback } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './index.css';
@@ -17,12 +17,11 @@ const App: React.FC = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImageSrc(reader.result as string);
-        setTextAdded(false); // Reset text added flag on new image upload 
+        setTextAdded(false); // Reset text added flag on new image upload
       };
       reader.readAsDataURL(file);
     }
   };
-
 
   const drawTextBackground = (
     ctx: CanvasRenderingContext2D,
@@ -91,19 +90,17 @@ const App: React.FC = () => {
 }
 
 
-const drawImageWithText = () => {
-  if (!imageSrc) {
-    toast.error("Please upload an image before adding text.");
-    return;
-  }
-  setTextAdded(true); // Indicate that text has been added
-  const canvas = canvasRef.current;
-  const ctx = canvas?.getContext('2d');
-  if (!canvas || !ctx) {
-    toast.error("Canvas or context is not available.");
-    return;
-  }
-  const img = new Image();
+  const drawImageWithText = useCallback(() => {
+    if (!imageSrc) {
+      return;
+    }
+    setTextAdded(true); // Indicate that text has been added
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) {
+      return;
+    }
+    const img = new Image();
   img.onload = () => {
     canvas.width = img.width;
     canvas.height = img.height;
@@ -128,8 +125,13 @@ const drawImageWithText = () => {
     }
   };
   img.src = imageSrc;
-};
+}, [imageSrc, topText, bottomText]);
 
+  useEffect(() => {
+    if (imageSrc) {
+      drawImageWithText();
+    }
+  }, [imageSrc, topText, bottomText, drawImageWithText]);
 
   const downloadMeme = () => {
     if (!imageSrc || !textAdded) {
@@ -153,13 +155,12 @@ const drawImageWithText = () => {
         <input type="text" placeholder="Top text" value={topText} onChange={(e) => setTopText(e.target.value)} className="input input-bordered w-full max-w-xs" />
         <input type="text" placeholder="Bottom text" value={bottomText} onChange={(e) => setBottomText(e.target.value)} className="input input-bordered w-full max-w-xs" />
         <div className="flex gap-4 justify-center">
-          <button onClick={drawImageWithText} className="btn btn-primary">Add Text</button>
           <button onClick={downloadMeme} className="btn btn-secondary">Download Meme</button>
         </div>
         {imageSrc && !textAdded && (
           <img src={imageSrc} alt="Uploaded" className="mt-4 mx-auto max-w-xs rounded-lg shadow-lg" />
         )}
-        <canvas ref={canvasRef} className={`mt-4 ${textAdded ? 'block' : 'hidden'} mx-auto`} />
+        <canvas ref={canvasRef} className={`mt-4 ${textAdded ? 'block' : 'hidden'} mx-auto w-full`} />
       </div>
     </div>
   );
