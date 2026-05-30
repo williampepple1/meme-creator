@@ -148,19 +148,67 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <div className="p-4 space-y-4 max-w-md mx-auto">
-        <ToastContainer />
-        <input type="file" onChange={handleImageChange} className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100" />
-        <input type="text" placeholder="Top text" value={topText} onChange={(e) => setTopText(e.target.value)} className="input input-bordered w-full max-w-xs" />
-        <input type="text" placeholder="Bottom text" value={bottomText} onChange={(e) => setBottomText(e.target.value)} className="input input-bordered w-full max-w-xs" />
-        <div className="flex gap-4 justify-center">
-          <button onClick={downloadMeme} className="btn btn-secondary">Download Meme</button>
+    <div className="min-h-screen bg-base-200 flex flex-col justify-center items-center p-4">
+      <ToastContainer />
+
+      {/* Central Card Wrapper */}
+      <div className="card bg-base-100 shadow-2xl w-full max-w-5xl">
+        <div className="card-body">
+          {/* Header */}
+          <h1 className="text-4xl font-bold text-center text-primary mb-8">Meme Creator</h1>
+
+          {/* Main Content Area */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+            {/* Controls Section */}
+            <div className="flex flex-col space-y-6">
+              <h2 className="text-2xl font-semibold border-b border-secondary pb-2">Edit Your Meme</h2>
+
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text">Upload Image</span>
+              </label>
+              <input type="file" onChange={handleImageChange} className="file-input file-input-bordered file-input-primary w-full" />
+            </div>
+
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text">Top Text</span>
+              </label>
+              <input type="text" placeholder="Enter top text here..." value={topText} onChange={(e) => setTopText(e.target.value)} className="input input-bordered w-full" />
+            </div>
+
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text">Bottom Text</span>
+              </label>
+              <input type="text" placeholder="Enter bottom text here..." value={bottomText} onChange={(e) => setBottomText(e.target.value)} className="input input-bordered w-full" />
+            </div>
+
+            <div className="card-actions justify-end mt-4">
+              <button onClick={downloadMeme} className="btn btn-primary w-full sm:w-auto mt-4 text-primary-content">Download Meme</button>
+            </div>
+            </div>
+
+            {/* Preview Section */}
+            <div className="flex flex-col items-center justify-center min-h-[400px] border-2 border-dashed border-secondary rounded-xl p-4 bg-base-200">
+               <h2 className="text-2xl font-semibold mb-4 w-full text-center text-accent">Preview</h2>
+              {!imageSrc && (
+                <div className="text-center text-base-content/50 my-auto flex flex-col items-center">
+                  <span className="text-4xl mb-2">📸</span>
+                  <p>Upload an image to start creating your meme!</p>
+                </div>
+              )}
+
+              {imageSrc && !textAdded && (
+                 <img src={imageSrc} alt="Uploaded" className="max-w-full h-auto rounded-lg shadow-md border border-primary/20" />
+              )}
+
+              <canvas ref={canvasRef} className={`max-w-full h-auto rounded-lg shadow-md border border-primary/20 ${textAdded ? 'block' : 'hidden'}`} />
+            </div>
+
+          </div>
         </div>
-        {imageSrc && !textAdded && (
-          <img src={imageSrc} alt="Uploaded" className="mt-4 mx-auto max-w-xs rounded-lg shadow-lg" />
-        )}
-        <canvas ref={canvasRef} className={`mt-4 ${textAdded ? 'block' : 'hidden'} mx-auto w-full`} />
       </div>
     </div>
   );
